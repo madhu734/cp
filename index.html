@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JU Assignment Cover Page Generator</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts for Elegant Academic Vibe -->
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;800&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <!-- React & ReactDOM -->
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+  <!-- Babel for JSX -->
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+  <style>
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background: radial-gradient(circle at top right, #f8fafc, #e2e8f0);
+    }
+    /* Times New Roman styling for the academic cover page */
+    .academic-font {
+      font-family: 'Times New Roman', Times, serif;
+    }
+    .serif-title {
+      font-family: 'Cinzel', serif;
+    }
+    /* Paper aspect ratio styling (A4 is 1:1.414) */
+    .a4-preview {
+      aspect-ratio: 1 / 1.414;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
+    }
+    
+    /* Print optimizations */
+    @media print {
+      body {
+        background: white !important;
+        margin: 0 !important;
+        padding: 0 !important;
+      }
+      .no-print {
+        display: none !important;
+      }
+      .print-area {
+        position: absolute !important;
+        left: 0 !important;
+        top: 0 !important;
+        width: 100% !important;
+        height: 100% !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        box-shadow: none !important;
+        border: none !important;
+        background: white !important;
+      }
+    }
+  </style>
+</head>
+<body class="min-h-screen text-slate-800 antialiased">
+
+  <div id="root"></div>
+
+  <script type="text/babel">
+    const { useState, useEffect, useMemo } = React;
+
+    // Student Database from PDF
+    const studentsData = [
+      { roll: "887", reg: "20221555493", name: "MD. MOSTAFIZUR RAHMAN" },
+      { roll: "889", reg: "20221555495", name: "MD. HABIBUL BASAR" },
+      { roll: "890", reg: "20221555496", name: "KHO. AL FAHAD" },
+      { roll: "891", reg: "20221555497", name: "TANVIR HASAN PIYAS" },
+      { roll: "892", reg: "20221555498", name: "INDRANIL DAS TAMAL" },
+      { roll: "893", reg: "20221555499", name: "RAGIB RIASHAT KHOIAM" },
+      { roll: "894", reg: "20221555500", name: "MD. ABU BAKKAR SIDDIK" },
+      { roll: "895", reg: "20221555501", name: "SHEIKH SHAHEK AHMED" },
+      { roll: "896", reg: "20221555502", name: "MD. ABU BAKOR SAAD" },
+      { roll: "897", reg: "20221555503", name: "AKAS MIA" },
+      { roll: "898", reg: "20221555504", name: "ABU JUMAIL MESHKAT" },
+      { roll: "899", reg: "20221555505", name: "MD. SAJIB" },
+      { roll: "900", reg: "20221555506", name: "FARUK HOSEN" },
+      { roll: "901", reg: "20221555507", name: "RIMON DATTA" },
+      { roll: "902", reg: "20221555508", name: "MAHMUDUL HASAN" },
+      { roll: "903", reg: "20221555509", name: "SM MUWAZ" },
+      { roll: "904", reg: "20221555510", name: "SHAKER AHMED" },
+      { roll: "905", reg: "20221555511", name: "SHEIKH LOKMAN GALIB" },
+      { roll: "906", reg: "20221555512", name: "MD. TANVIR AHMED BADON" },
+      { roll: "907", reg: "20221555513", name: "USAMA SHEΙΚΗ" },
+      { roll: "908", reg: "20221555514", name: "MD. JANNAT HOSSAIN" },
+      { roll: "909", reg: "20221555515", name: "MD. ABID HASAN RAFI" },
+      { roll: "910", reg: "20221555516", name: "MD. MIZANUR RAHMAN" },
+      { roll: "911", reg: "20221555517", name: "KAMRUL HASAN" },
+      { roll: "912", reg: "20221555518", name: "MONJIL HASAN" },
+      { roll: "913", reg: "20221555519", name: "MD. ATIKUR RAHMAN" },
+      { roll: "914", reg: "20221555520", name: "MD. MANIK HOSSEN" },
+      { roll: "915", reg: "20221555521", name: "TAHMID TAJWAR" },
+      { roll: "916", reg: "20221555522", name: "MD. SAJJAD HOSSAIN SHIMUL" },
+      { roll: "917", reg: "20221555523", name: "TAUHIDUL ISLAM MADHU" },
+      { roll: "918", reg: "20221555524", name: "BHUIYAN MD. JAHID SAMI" },
+      { roll: "919", reg: "20221555525", name: "ABID M NAFID" },
+      { roll: "920", reg: "20221555526", name: "OMOR FARUK MIRAJ" },
+      { roll: "921", reg: "20221555527", name: "MISHNAN SHAHID" },
+      { roll: "922", reg: "20221555528", name: "SAFIN MIA" },
+      { roll: "923", reg: "20221555529", name: "SHARKER MOHAMMAD SAYEM" },
+      { roll: "924", reg: "20221555530", name: "MEHEDI HASAN MASHRAFI" },
+      { roll: "925", reg: "20221555531", name: "TAHMID MUNIM SAMYA" },
+      { roll: "926", reg: "20221555532", name: "NAWAL BIN MAZIB" },
+      { roll: "927", reg: "20221555533", name: "RICHARD NICKSON HASDAK" },
+      { roll: "928", reg: "20221555534", name: "NUSRAT TABASSUM" },
+      { roll: "929", reg: "20221555535", name: "MST. LIMA KHATUN" },
+      { roll: "930", reg: "20221555536", name: "SAYEDA ISLAM SHEFA" },
+      { roll: "931", reg: "20221555537", name: "NISHITA SARKER" },
+      { roll: "932", reg: "20221555538", name: "SAADIA KHATUN ELMA" },
+      { roll: "933", reg: "20221555539", name: "MOUMITA KUNDU" },
+      { roll: "934", reg: "20221555540", name: "SUMONA TANJIN MIM" },
+      { roll: "935", reg: "20221555541", name: "SADIA ANJUM HEYA" },
+      { roll: "936", reg: "20221555542", name: "NUSRAT JAHAN BINTU" },
+      { roll: "937", reg: "20221555543", name: "MST. AFSANA AKTER" },
+      { roll: "938", reg: "20221555544", name: "MUSARRAT MUNAM" },
+      { roll: "939", reg: "20221555545", name: "AYSHA AKTER AFRIN" },
+      { roll: "940", reg: "20221555546", name: "DEBANJANA DEB" },
+      { roll: "941", reg: "20221555547", name: "SAMARA YASNIN SAMANTA" },
+      { roll: "942", reg: "20221555548", name: "KAZI ZAHANARA HELEN" },
+      { roll: "943", reg: "20221555549", name: "MEHERUN NESA" },
+      { roll: "944", reg: "20221555550", name: "MONISHA SARKAR" },
+      { roll: "945", reg: "20221555551", name: "MST. MEFTAHUL ZANNAT DIPA" },
+      { roll: "946", reg: "20221555552", name: "HASNAT MONISHA" },
+      { roll: "947", reg: "20221555553", name: "NEELA SAHA PAYEL" },
+      { roll: "948", reg: "20221555554", name: "NOWRIN KHAN" },
+      { roll: "949", reg: "20221555555", name: "SUMAYA AFRIN RIA" },
+      { roll: "950", reg: "20221555556", name: "DEWAN NUSRAT JAHAN SUPTI" },
+      { roll: "951", reg: "20221555557", name: "MARIA SARKAR MIHI" },
+      { roll: "952", reg: "20221555558", name: "AFIA FARJANA DISHA" },
+      { roll: "953", reg: "20221555559", name: "MST. NUZHAT TABASSUM TANHA" },
+      { roll: "954", reg: "20221555560", name: "MOST. ISRAT JAHAN SHIMU" },
+      { roll: "955", reg: "20221555561", name: "MST. FATIMA KHATUN" },
+      { roll: "956", reg: "20221555562", name: "ADRITA JAFRIN SHREYA" },
+      { roll: "957", reg: "20221555563", name: "NUSRAT JAHAN" },
+      { roll: "958", reg: "20221555564", name: "FAHMIDA" },
+      { roll: "959", reg: "20221555565", name: "WHOMAYRA MARIUM HEMI" },
+      { roll: "960", reg: "20221555566", name: "ANIKA KHAN" },
+      { roll: "961", reg: "20221555567", name: "SABRINA TABASSUM OEYSHI" },
+      { roll: "962", reg: "20221555568", name: "MORIOM AKTER MIM" }
+    ];
+
+    // Course List from the Syllabus Attachment
+    const coursesData = [
+      { code: "E 401", title: "20th Century English Literature I" },
+      { code: "E 402", title: "20th Century North American Literature I" },
+      { code: "E 403", title: "Critical and Cultural Theory" },
+      { code: "E 404", title: "Sociolinguistics" },
+      { code: "E 405", title: "Semantics and Pragmatics" },
+      { code: "E 406", title: "20th Century English Literature II" },
+      { code: "E 407", title: "20th Century North American Literature II" },
+      { code: "E 408", title: "20th Century South Asian Literature in English" },
+      { code: "E 409", title: "Research Methods in Literature in English and Cultural Studies" },
+      { code: "E 410", title: "Phonetics and Phonology" },
+      { code: "E 411", title: "Morphology and Syntax" },
+      { code: "E 412", title: "Psycholinguistics" },
+      { code: "E 413", title: "Research Methods in Applied Linguistics and ELT" }
+    ];
+
+    // Teacher List
+    const teachersData = [
+      { name: "DR. MD. MANIRUZZAMAN", designation: "Professor" },
+      { name: "DR. M. MONZURUR RAHMAN", designation: "Professor" },
+      { name: "LAILA HALIM", designation: "Professor" },
+      { name: "SABERA SULTANA", designation: "Professor" },
+      { name: "DR. SHAHNAZ KANIZ", designation: "Professor" },
+      { name: "DR. REZWANA SULTANA", designation: "Associate Professor" }
+    ];
+
+    function App() {
+      // Form States
+      const [assignmentTopic, setAssignmentTopic] = useState("Differentiate between adjectives and adverbs in clauses and sentences.\nDiscuss how some words can function as both adjectives and adverbs with ten examples.");
+      const [selectedCourseCode, setSelectedCourseCode] = useState("E 411");
+      const [customCourseTitle, setCustomCourseTitle] = useState("Morphology and Syntax");
+      const [selectedTeacherIndex, setSelectedTeacherIndex] = useState(0);
+      const [customTeacherName, setCustomTeacherName] = useState("");
+      const [customTeacherDesignation, setCustomTeacherDesignation] = useState("");
+      const [isCustomTeacher, setIsCustomTeacher] = useState(false);
+      
+      const [selectedRoll, setSelectedRoll] = useState("952");
+      const [studentName, setStudentName] = useState("AFIA FARJANA DISHA");
+      const [studentReg, setStudentReg] = useState("20221555558");
+      
+      const [session, setSession] = useState("2021-22");
+      const [submissionDate, setSubmissionDate] = useState("2026-06-15");
+
+      // Aesthetics States
+      const [borderStyle, setBorderStyle] = useState("double"); // double, solid, thin-double, none
+      const [borderColor, setBorderColor] = useState("#006599"); // JU Blue
+      const [logoColor, setLogoColor] = useState("#006599");
+
+      // Auto-update Course Title when Code Changes
+      useEffect(() => {
+        const found = coursesData.find(c => c.code === selectedCourseCode);
+        if (found) {
+          setCustomCourseTitle(found.title);
+        }
+      }, [selectedCourseCode]);
+
+      // Auto-update Student Info when Roll changes
+      useEffect(() => {
+        const found = studentsData.find(s => s.roll === selectedRoll);
+        if (found) {
+          setStudentName(found.name);
+          setStudentReg(found.reg);
+        }
+      }, [selectedRoll]);
+
+      // Teacher Info Selector Handler
+      const currentTeacher = useMemo(() => {
+        if (isCustomTeacher) {
+          return { name: customTeacherName, designation: customTeacherDesignation };
+        }
+        return teachersData[selectedTeacherIndex] || { name: "", designation: "" };
+      }, [isCustomTeacher, selectedTeacherIndex, customTeacherName, customTeacherDesignation]);
+
+      // Format Submission Date elegantly (e.g. 15 June 2026 or 15/06/2026)
+      const formattedDate = useMemo(() => {
+        if (!submissionDate) return "";
+        const parts = submissionDate.split("-");
+        if (parts.length === 3) {
+          // Check if custom string
+          return `${parts[2]}/${parts[1]}/${parts[0]}`;
+        }
+        return submissionDate;
+      }, [submissionDate]);
+
+      // Handle custom print
+      const triggerPrint = () => {
+        window.print();
+      };
+
+      // Export as editable Word File (.doc format using Office HTML technique)
+      const downloadWord = () => {
+        const content = document.getElementById("cover-page-document").innerHTML;
+        const head = `
+          <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
+          <head>
+            <title>Cover Page</title>
+            <style>
+              @page {
+                size: 8.5in 11in;
+                margin: 1.0in 1.0in 1.0in 1.0in;
+                mso-header-margin: .5in;
+                mso-footer-margin: .5in;
+              }
+              body {
+                font-family: 'Times New Roman', Serif;
+                text-align: center;
+              }
+              .border-container {
+                border: 3px double #000;
+                height: 100%;
+                padding: 20px;
+              }
+              p, div, span, h1, h2, h3 {
+                font-family: 'Times New Roman', Serif;
+              }
+            </style>
+          </head>
+          <body>
+            <div class="border-container">
+              ${content}
+            </div>
+          </body>
+          </html>
+        `;
+        const blob = new Blob(['\ufeff' + head], { type: 'application/msword' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `Cover_Page_${selectedCourseCode || 'Assignment'}.doc`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+      };
+
+      return (
+        <div class="min-h-screen flex flex-col lg:flex-row gap-6 p-4 lg:p-8">
+          
+          {/* Controls Panel (Left Panel) - Hidden during print */}
+          <div class="w-full lg:w-[420px] bg-white/95 backdrop-blur-md rounded-3xl p-6 lg:p-8 shadow-xl flex flex-col gap-6 border border-slate-200/80 no-print max-h-[92vh] overflow-y-auto shrink-0">
+            <div>
+              <div class="flex items-center gap-3">
+                <div class="p-2.5 bg-blue-50 text-blue-600 rounded-xl">
+                  <i data-lucide="sparkles" class="w-6 h-6"></i>
+                </div>
+                <div>
+                  <h1 class="text-xl font-bold bg-gradient-to-r from-blue-700 to-indigo-800 bg-clip-text text-transparent">JU Cover Page Generator</h1>
+                  <p class="text-xs text-slate-500 font-medium">Department of English, Jahangirnagar University</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="h-px bg-slate-200/80"></div>
+
+            {/* Form Inputs */}
+            <div class="flex flex-col gap-5">
+              
+              {/* Assignment Topic */}
+              <div class="flex flex-col gap-1.5">
+                <label class="text-xs font-bold text-slate-700 uppercase tracking-wide flex items-center gap-1">
+                  <i data-lucide="edit-3" class="w-3.5 h-3.5 text-blue-500"></i> Assignment Topic
+                </label>
+                <textarea
+                  value={assignmentTopic}
+                  onChange={(e) => setAssignmentTopic(e.target.value)}
+                  placeholder="Enter the detailed topic of the assignment here..."
+                  class="w-full p-3 text-sm rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-slate-50/50 min-h-[90px] resize-y"
+                />
+              </div>
+
+              {/* Course Selection */}
+              <div class="flex flex-col gap-1.5">
+                <label class="text-xs font-bold text-slate-700 uppercase tracking-wide flex items-center gap-1">
+                  <i data-lucide="book-open" class="w-3.5 h-3.5 text-blue-500"></i> Course Code & Title
+                </label>
+                <div class="grid grid-cols-3 gap-2">
+                  <select
+                    value={selectedCourseCode}
+                    onChange={(e) => setSelectedCourseCode(e.target.value)}
+                    class="col-span-1 p-2 text-sm rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+                  >
+                    {coursesData.map(c => (
+                      <option key={c.code} value={c.code}>{c.code}</option>
+                    ))}
+                  </select>
+                  <input
+                    type="text"
+                    value={customCourseTitle}
+                    onChange={(e) => setCustomCourseTitle(e.target.value)}
+                    class="col-span-2 p-2 text-sm rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-slate-50/50"
+                    placeholder="Course Title"
+                  />
+                </div>
+              </div>
+
+              {/* Teacher Info */}
+              <div class="flex flex-col gap-1.5">
+                <label class="text-xs font-bold text-slate-700 uppercase tracking-wide flex items-center gap-1">
+                  <i data-lucide="award" class="w-3.5 h-3.5 text-blue-500"></i> Submitted To (Teacher)
+                </label>
+                <div class="flex items-center gap-2 mb-1">
+                  <input
+                    type="checkbox"
+                    id="custom-teacher"
+                    checked={isCustomTeacher}
+                    onChange={(e) => setIsCustomTeacher(e.target.checked)}
+                    class="rounded text-blue-600 focus:ring-blue-500"
+                  />
+                  <label htmlFor="custom-teacher" class="text-xs font-medium text-slate-600 select-none cursor-pointer">
+                    Use custom teacher credentials
+                  </label>
+                </div>
+                {!isCustomTeacher ? (
+                  <select
+                    value={selectedTeacherIndex}
+                    onChange={(e) => setSelectedTeacherIndex(parseInt(e.target.value))}
+                    class="w-full p-2.5 text-sm rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+                  >
+                    {teachersData.map((t, idx) => (
+                      <option key={idx} value={idx}>{t.name} ({t.designation})</option>
+                    ))}
+                  </select>
+                ) : (
+                  <div class="flex flex-col gap-2 p-3 bg-slate-50/80 rounded-xl border border-slate-200">
+                    <input
+                      type="text"
+                      value={customTeacherName}
+                      onChange={(e) => setCustomTeacherName(e.target.value)}
+                      placeholder="Teacher Name"
+                      class="w-full p-2 text-xs rounded-lg border border-slate-200 bg-white"
+                    />
+                    <input
+                      type="text"
+                      value={customTeacherDesignation}
+                      onChange={(e) => setCustomTeacherDesignation(e.target.value)}
+                      placeholder="Designation (e.g. Professor)"
+                      class="w-full p-2 text-xs rounded-lg border border-slate-200 bg-white"
+                    />
+                  </div>
+                )}
+              </div>
+
+              {/* Student Roll & Auto details */}
+              <div class="flex flex-col gap-1.5">
+                <label class="text-xs font-bold text-slate-700 uppercase tracking-wide flex items-center gap-1">
+                  <i data-lucide="user" class="w-3.5 h-3.5 text-blue-500"></i> Student Credentials (Roll Finder)
+                </label>
+                <div class="grid grid-cols-4 gap-2">
+                  <div class="col-span-1 flex flex-col gap-1">
+                    <span class="text-[10px] font-bold text-slate-400">ROLL</span>
+                    <select
+                      value={selectedRoll}
+                      onChange={(e) => setSelectedRoll(e.target.value)}
+                      class="w-full p-2 text-sm rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white font-semibold"
+                    >
+                      {studentsData.map(s => (
+                        <option key={s.roll} value={s.roll}>{s.roll}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <div class="col-span-3 flex flex-col gap-1">
+                    <span class="text-[10px] font-bold text-slate-400">NAME & REGISTRATION (AUTO-FILLED)</span>
+                    <div class="p-2 text-xs rounded-xl border border-slate-200/80 bg-slate-50 font-medium flex flex-col justify-center h-full">
+                      <span class="font-bold text-slate-800 line-clamp-1">{studentName}</span>
+                      <span class="text-[10px] text-slate-500">Reg: {studentReg}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Session & Date */}
+              <div class="grid grid-cols-2 gap-3">
+                <div class="flex flex-col gap-1.5">
+                  <label class="text-xs font-bold text-slate-700 uppercase tracking-wide flex items-center gap-1">
+                    <i data-lucide="calendar" class="w-3.5 h-3.5 text-blue-500"></i> Session
+                  </label>
+                  <input
+                    type="text"
+                    value={session}
+                    onChange={(e) => setSession(e.target.value)}
+                    placeholder="e.g. 2021-22"
+                    class="w-full p-2.5 text-sm rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-slate-50/50"
+                  />
+                </div>
+                <div class="flex flex-col gap-1.5">
+                  <label class="text-xs font-bold text-slate-700 uppercase tracking-wide flex items-center gap-1">
+                    <i data-lucide="clock" class="w-3.5 h-3.5 text-blue-500"></i> Submission Date
+                  </label>
+                  <input
+                    type="date"
+                    value={submissionDate}
+                    onChange={(e) => setSubmissionDate(e.target.value)}
+                    class="w-full p-2.5 text-sm rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-slate-50/50 text-slate-600 font-semibold"
+                  />
+                </div>
+              </div>
+
+              {/* Design Customizations */}
+              <div class="h-px bg-slate-200/80"></div>
+              <div class="flex flex-col gap-3">
+                <h3 class="text-xs font-bold text-slate-700 uppercase tracking-wide flex items-center gap-1">
+                  <i data-lucide="palette" class="w-3.5 h-3.5 text-blue-500"></i> Quick Styling Tools
+                </h3>
+                
+                {/* Border Picker */}
+                <div class="flex items-center justify-between gap-2">
+                  <span class="text-xs font-medium text-slate-600">Border Style</span>
+                  <div class="flex bg-slate-100 rounded-lg p-0.5 border border-slate-200/60">
+                    <button
+                      onClick={() => setBorderStyle("double")}
+                      class={`px-2.5 py-1 text-xs rounded-md font-semibold transition-all ${borderStyle === "double" ? "bg-white text-blue-700 shadow-sm" : "text-slate-500 hover:text-slate-800"}`}
+                    >
+                      Double
+                    </button>
+                    <button
+                      onClick={() => setBorderStyle("solid")}
+                      class={`px-2.5 py-1 text-xs rounded-md font-semibold transition-all ${borderStyle === "solid" ? "bg-white text-blue-700 shadow-sm" : "text-slate-500 hover:text-slate-800"}`}
+                    >
+                      Classic
+                    </button>
+                    <button
+                      onClick={() => setBorderStyle("none")}
+                      class={`px-2.5 py-1 text-xs rounded-md font-semibold transition-all ${borderStyle === "none" ? "bg-white text-blue-700 shadow-sm" : "text-slate-500 hover:text-slate-800"}`}
+                    >
+                      None
+                    </button>
+                  </div>
+                </div>
+
+                {/* Color presets for Border and Logo */}
+                <div class="flex items-center justify-between gap-2">
+                  <span class="text-xs font-medium text-slate-600">Theme Ink Color</span>
+                  <div class="flex gap-2">
+                    {[
+                      { name: 'JU Navy', hex: '#006599' },
+                      { name: 'Classic Black', hex: '#000000' },
+                      { name: 'Royal Crimson', hex: '#881337' },
+                      { name: 'Emerald Scholar', hex: '#064e3b' }
+                    ].map(color => (
+                      <button
+                        key={color.hex}
+                        onClick={() => { setBorderColor(color.hex); setLogoColor(color.hex); }}
+                        style={{ backgroundColor: color.hex }}
+                        title={color.name}
+                        class={`w-6 h-6 rounded-full border-2 transition-all ${borderColor === color.hex ? 'border-amber-400 scale-110 shadow-md' : 'border-white hover:scale-105'}`}
+                      />
+                    ))}
+                  </div>
+                </div>
+
+              </div>
+
+            </div>
+
+            {/* Print/Download Actions */}
+            <div class="mt-auto pt-6 flex flex-col gap-3">
+              <button
+                onClick={triggerPrint}
+                class="w-full py-3 bg-gradient-to-r from-blue-700 to-indigo-800 hover:from-blue-800 hover:to-indigo-900 text-white font-bold rounded-2xl shadow-lg shadow-indigo-600/15 flex items-center justify-center gap-2 transition-all hover:scale-[1.02] active:scale-[0.98]"
+              >
+                <i data-lucide="printer" class="w-5 h-5"></i>
+                Print / Save as PDF
+              </button>
+              
+              <button
+                onClick={downloadWord}
+                class="w-full py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-2xl flex items-center justify-center gap-2 border border-slate-300/60 transition-all hover:scale-[1.02] active:scale-[0.98]"
+              >
+                <i data-lucide="file-text" class="w-5 h-5 text-blue-600"></i>
+                Export to Editable MS Word
+              </button>
+              
+              <div class="text-[10px] text-center text-slate-400 font-medium">
+                Tip: If printing to PDF, enable "Background graphics" and set layout to "A4 Portrait" with "None/Default" margins.
+              </div>
+            </div>
+          </div>
+
+          {/* Live Document Preview Panel (Right Panel) */}
+          <div class="flex-1 flex justify-center items-center bg-slate-300/40 p-4 rounded-3xl overflow-x-auto min-h-[90vh]">
+            
+            {/* The A4 Page simulation */}
+            <div 
+              id="cover-page-document"
+              class="print-area w-full max-w-[800px] a4-preview bg-white shadow-2xl p-12 lg:p-16 flex flex-col items-center justify-between relative transition-all"
+              style={{
+                border: borderStyle === "double" ? `10px double ${borderColor}` : borderStyle === "solid" ? `3px solid ${borderColor}` : "none",
+                margin: '0 auto',
+                boxSizing: 'border-box'
+              }}
+            >
+              
+              {/* JU Logo (Elegant Hand-drawn High Quality SVG representation of Jahangirnagar University emblem) */}
+              <div class="flex flex-col items-center gap-2 transition-all mt-4">
+                <svg width="120" height="120" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg" class="transition-all">
+                  {/* Outer Shield Border */}
+                  <path d="M100 10 L140 30 C160 80 145 135 100 160 C55 135 40 80 60 30 Z" stroke={logoColor} strokeWidth="3" fill="none" />
+                  {/* Decorative Frame Elements (representing traditional curves) */}
+                  <circle cx="100" cy="95" r="45" stroke={logoColor} strokeWidth="2" strokeDasharray="4 2" />
+                  <circle cx="100" cy="95" r="35" stroke={logoColor} strokeWidth="1.5" />
+                  
+                  {/* Lotus petals (শাপলা) in the center */}
+                  <path d="M100 70 C95 82 82 92 82 105 C82 115 90 120 100 120 C110 120 118 115 118 105 C118 92 105 82 100 70 Z" stroke={logoColor} strokeWidth="2.5" fill="none" />
+                  <path d="M100 80 C88 88 72 95 72 106 C72 114 80 118 88 118 C95 118 98 112 100 108" stroke={logoColor} strokeWidth="2" fill="none" />
+                  <path d="M100 80 C112 88 128 95 128 106 C128 114 120 118 112 118 C105 118 102 112 100 108" stroke={logoColor} strokeWidth="2" fill="none" />
+                  
+                  {/* Decorative bottom curves for university style */}
+                  <path d="M50 145 C70 165 130 165 150 145" stroke={logoColor} strokeWidth="2" strokeLinecap="round" />
+                  
+                  {/* Bengali text representing 'জাহাঙ্গীরনগর বিশ্ববিদ্যালয়' below the shield */}
+                  <text x="100" y="180" textAnchor="middle" fill={logoColor} style={{ fontFamily: 'sans-serif', fontSize: '11px', fontWeight: 'bold', letterSpacing: '0.5px' }}>জাহাঙ্গীরনগর বিশ্ববিদ্যালয়</text>
+                </svg>
+              </div>
+
+              {/* Assignment Topic Section */}
+              <div class="w-full text-center flex flex-col gap-5 my-6">
+                <span class="academic-font uppercase tracking-widest text-slate-500 font-bold text-xs lg:text-sm">Assignment on</span>
+                <div class="h-0.5 w-16 bg-slate-300 mx-auto"></div>
+                <h2 class="academic-font font-bold text-base lg:text-xl text-slate-900 leading-relaxed max-w-[90%] mx-auto whitespace-pre-line px-4">
+                  {assignmentTopic || "Please enter your Assignment Topic"}
+                </h2>
+              </div>
+
+              {/* Course details */}
+              <div class="w-full text-center flex flex-col gap-1">
+                <p class="academic-font font-bold text-sm lg:text-base text-slate-800">
+                  Course Code: <span class="uppercase font-semibold">{selectedCourseCode}</span>
+                </p>
+                <p class="academic-font font-bold text-base lg:text-lg text-slate-800">
+                  Course Title: {customCourseTitle || "Selected Course Title"}
+                </p>
+              </div>
+
+              {/* Information Grid for Submitted To and Submitted By (Department Format Style) */}
+              <div class="w-full grid grid-cols-2 gap-8 text-left mt-4 border-t border-slate-200/60 pt-8 px-6">
+                
+                {/* Submitted To Details */}
+                <div class="flex flex-col gap-2">
+                  <span class="academic-font uppercase tracking-wider text-slate-400 font-bold text-[10px]">Submitted to</span>
+                  <div class="flex flex-col gap-0.5">
+                    <p class="academic-font font-bold text-sm lg:text-[15px] text-slate-900">{currentTeacher.name}</p>
+                    <p class="academic-font text-xs lg:text-sm text-slate-600 font-medium">{currentTeacher.designation}</p>
+                    <p class="academic-font text-xs text-slate-500 mt-1">Department of English</p>
+                    <p class="academic-font text-xs text-slate-500 font-medium">Jahangirnagar University</p>
+                    <p class="academic-font text-[11px] text-slate-400">Savar, Dhaka</p>
+                  </div>
+                </div>
+
+                {/* Submitted By Details */}
+                <div class="flex flex-col gap-2">
+                  <span class="academic-font uppercase tracking-wider text-slate-400 font-bold text-[10px]">Submitted by</span>
+                  <div class="flex flex-col gap-0.5">
+                    <p class="academic-font font-bold text-sm lg:text-[15px] text-slate-900">{studentName}</p>
+                    <p class="academic-font text-xs lg:text-sm text-slate-700 font-medium">Roll No: <span class="font-bold">{selectedRoll}</span></p>
+                    <p class="academic-font text-xs lg:text-sm text-slate-700 font-medium">Registration: {studentReg}</p>
+                    <p class="academic-font text-xs text-slate-500 mt-1">Session: {session}</p>
+                    <p class="academic-font text-xs text-slate-500">Department of English</p>
+                    <p class="academic-font text-[11px] text-slate-400">Faculty of Arts & Humanities</p>
+                  </div>
+                </div>
+
+              </div>
+
+              {/* Submission Date */}
+              <div class="w-full text-center border-t border-slate-100 pt-6 pb-2">
+                <p class="academic-font font-bold text-xs lg:text-sm text-slate-700">
+                  Submission Date: <span class="font-semibold text-slate-900">{formattedDate || "DD/MM/YYYY"}</span>
+                </p>
+              </div>
+
+            </div>
+          </div>
+
+        </div>
+      );
+    }
+
+    // Initialize Lucide icons on render
+    const container = document.getElementById('root');
+    const root = ReactDOM.createRoot(container);
+    root.render(<App />);
+    
+    // Trigger icons render after DOM paints
+    setTimeout(() => {
+      lucide.createIcons();
+    }, 1000);
+  </script>
+</body>
+</html>
