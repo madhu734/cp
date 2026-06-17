@@ -6,7 +6,7 @@
   <title>Cover Page 51</title>
   
   <!-- High Quality SVG Bumblebee Favicon -->
-  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cellipse cx='35' cy='35' rx='14' ry='24' fill='%2338BDF8' fill-opacity='0.4' stroke='%230284C7' stroke-width='4' transform='rotate(-30 35 35)'/%3E%3Cellipse cx='65' cy='35' rx='14' ry='24' fill='%2338BDF8' fill-opacity='0.4' stroke='%230284C7' stroke-width='4' transform='rotate(30 65 35)'/%3E%3Crect x='38' y='35' width='24' height='38' rx='12' fill='%23FBBF24' stroke='%231E293B' stroke-width='5'/%3E%3Ccircle cx='50' cy='27' r='9' fill='%23FBBF24' stroke='%231E293B' stroke-width='5'/%3E%3C/svg%3E">
+  <link class="no-print" rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cellipse cx='35' cy='35' rx='14' ry='24' fill='%2338BDF8' fill-opacity='0.4' stroke='%230284C7' stroke-width='4' transform='rotate(-30 35 35)'/%3E%3Cellipse cx='65' cy='35' rx='14' ry='24' fill='%2338BDF8' fill-opacity='0.4' stroke='%230284C7' stroke-width='4' transform='rotate(30 65 35)'/%3E%3Crect x='38' y='35' width='24' height='38' rx='12' fill='%23FBBF24' stroke='%231E293B' stroke-width='5'/%3E%3Ccircle cx='50' cy='27' r='9' fill='%23FBBF24' stroke='%231E293B' stroke-width='5'/%3E%3C/svg%3E">
   
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -157,13 +157,30 @@
       { code: "E 413", title: "Research Methods in Applied Linguistics and ELT" }
     ];
 
+    // Crawled Official Faculty List - Department of English, Jahangirnagar University
     const teachersData = [
       { name: "DR. MD. MANIRUZZAMAN", designation: "Professor, Department of English" },
-      { name: "DR. M. MONZURUR RAHMAN", designation: "Professor, Department of English" },
-      { name: "LAILA HALIM", designation: "Professor, Department of English" },
-      { name: "SABERA SULTANA", designation: "Professor, Department of English" },
-      { name: "DR. SHAHNAZ KANIZ", designation: "Professor, Department of English" },
-      { name: "DR. REZWANA SULTANA", designation: "Associate Professor, Department of English" }
+      { name: "AHMED REZA", designation: "Professor, Department of English" },
+      { name: "DR. SANYAT SATTAR", designation: "Professor, Department of English" },
+      { name: "MASHRUR SHAHID HOSSAIN", designation: "Professor, Department of English" },
+      { name: "DR. LAIZU NASRIN", designation: "Professor, Department of English" },
+      { name: "DR. MOHAMMAD RAIHAN SHARIF", designation: "Professor, Department of English" },
+      { name: "RUMANA HOSSAIN", designation: "Associate Professor, Department of English" },
+      { name: "MANMAY ZAFAR", designation: "Associate Professor, Department of English" },
+      { name: "SABERA SULTANA", designation: "Associate Professor, Department of English" },
+      { name: "TANIA SHARMIN", designation: "Associate Professor, Department of English" },
+      { name: "KAZI ASHRAF UDDIN", designation: "Associate Professor, Department of English" },
+      { name: "MD. AFAZ UDDIN", designation: "Associate Professor, Department of English" },
+      { name: "MEHNAZ MUSTAFA IQBAL", designation: "Assistant Professor, Department of English" },
+      { name: "SHWAGOTA SAYEED", designation: "Assistant Professor, Department of English" },
+      { name: "SUMANA GUPTA", designation: "Assistant Professor, Department of English" },
+      { name: "TANIA TASNEEM HOSSAIN", designation: "Assistant Professor, Department of English" },
+      { name: "ANINDITA ROY", designation: "Assistant Professor, Department of English" },
+      { name: "RABITA RAHMAN", designation: "Assistant Professor, Department of English" },
+      { name: "FARZANA ZEBEEN KHAN", designation: "Assistant Professor, Department of English" },
+      { name: "MD TAQI YASIR", designation: "Lecturer, Department of English" },
+      { name: "JARIN TASNEEM SHOILEE", designation: "Lecturer, Department of English" },
+      { name: "MD. SALAH UDDIN", designation: "Lecturer, Department of English" }
     ];
 
     function App() {
@@ -365,7 +382,7 @@
               
               ${layoutStyle === 'centered' ? centeredDetailsHtml : sideBySideDetailsHtml}
               
-              <p align="center" style="margin-top: 50px;">Submission Date: - ${formattedDate}</p>
+              <p align="center" style="margin-top: 50px;"><b>Submission Date: - ${formattedDate}</b></p>
             </div>
           </body>
           </html>
@@ -388,7 +405,7 @@
           {showModal && (
             <div class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center z-50 p-4 transition-all">
               <div class="bg-white rounded-2xl max-w-sm w-full p-6 shadow-2xl border border-slate-100 flex flex-col items-center text-center gap-4">
-                <div class="w-12 h-12 rounded-full bg-red-50 text-red-500 flex items-center justify-center">
+                <div class="w-12 h-12 rounded-full bg-red-50 text-red-500 flex items-center justify-center animate-bounce">
                   <i data-lucide="alert-triangle" class="w-6 h-6"></i>
                 </div>
                 <div>
@@ -524,7 +541,7 @@
                 <img 
                   src={base64Logo || "https://i.postimg.cc/3xrkfThk/ju-logo.png"} 
                   alt="JU Logo" 
-                  class="w-[90px] h-[90px] object-contain mb-4" 
+                  class="w-[110px] h-[110px] object-contain mb-4 mt-2" 
                   crossOrigin="anonymous"
                 />
 
@@ -536,10 +553,10 @@
                 </div>
               </div>
 
-              {/* Middle: Course Info */}
-              <div class="academic-font text-center flex flex-col gap-1 text-[13px] lg:text-[15px] w-full">
-                <p class="font-bold">Course Code: {selectedCourseCode || "_____"}</p>
-                <p class="font-bold">Course Title: {currentCourseTitle}</p>
+              {/* Middle: Course Info - Completely Bold */}
+              <div class="academic-font text-center flex flex-col gap-1 text-[13px] lg:text-[15px] w-full font-bold">
+                <p>Course Code: {selectedCourseCode || "_____"}</p>
+                <p>Course Title: {currentCourseTitle}</p>
               </div>
 
               {/* Lower Middle: Submitted To & By based on Layout Style */}
@@ -591,8 +608,8 @@
                 </div>
               )}
 
-              {/* Bottom: Submission Date */}
-              <div class="w-full academic-font text-center text-[13px] lg:text-[15px] font-medium mt-2">
+              {/* Bottom: Submission Date - Completely Bold */}
+              <div class="w-full academic-font text-center text-[13px] lg:text-[15px] font-bold mt-2">
                 <p>Submission Date: - {formattedDate}</p>
               </div>
 
