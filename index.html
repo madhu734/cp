@@ -6,7 +6,7 @@
   <title>Cover Page 51</title>
   
   <!-- High Quality SVG Bumblebee Favicon -->
-  <link class="no-print" rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cellipse cx='35' cy='35' rx='14' ry='24' fill='%2338BDF8' fill-opacity='0.4' stroke='%230284C7' stroke-width='4' transform='rotate(-30 35 35)'/%3E%3Cellipse cx='65' cy='35' rx='14' ry='24' fill='%2338BDF8' fill-opacity='0.4' stroke='%230284C7' stroke-width='4' transform='rotate(30 65 35)'/%3E%3Crect x='38' y='35' width='24' height='38' rx='12' fill='%23FBBF24' stroke='%231E293B' stroke-width='5'/%3E%3Ccircle cx='50' cy='27' r='9' fill='%23FBBF24' stroke='%231E293B' stroke-width='5'/%3E%3C/svg%3E">
+  <link class="no-print" rel="icon" type="image/jpeg" href="https://i.postimg.cc/02Yb36Sv/bb.jpg">
   
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -21,7 +21,7 @@
   <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
   <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
   
-  <!-- Babel -->
+  <!-- Babel - Pinned to stable version to prevent preview crash -->
   <script src="https://unpkg.com/@babel/standalone@7.25.6/babel.min.js"></script>
 
   <!-- html2pdf.js -->
@@ -38,12 +38,13 @@
     /* Academic specific fonts to strictly match the Word document */
     .academic-font {
       font-family: 'Times New Roman', Times, serif;
-      line-height: 1.35;
+      line-height: 1.25;
     }
     
-    /* Perfect A4 Ratio (1:1.414) */
+    /* Perfect A4 Ratio for screen viewing */
     .a4-preview {
-      aspect-ratio: 1 / 1.414;
+      width: 794px;
+      height: 1123px;
       box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.15);
       background: white;
     }
@@ -53,6 +54,22 @@
     ::-webkit-scrollbar-track { background: transparent; }
     ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
     ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+    /* Smart Date Picker Hack: Makes the entire input box clickable */
+    .smart-date-input {
+      position: relative;
+    }
+    .smart-date-input::-webkit-calendar-picker-indicator {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      width: 100%;
+      height: 100%;
+      opacity: 0;
+      cursor: pointer;
+    }
   </style>
 </head>
 <body class="min-h-screen text-slate-800 antialiased overflow-x-hidden">
@@ -62,7 +79,7 @@
   <script type="text/babel">
     const { useState, useEffect, useMemo } = React;
 
-    // --- Data Sources ---
+    // --- Student Database ---
     const studentsData = [
       { roll: "887", reg: "20221555493", name: "MD. MOSTAFIZUR RAHMAN" },
       { roll: "889", reg: "20221555495", name: "MD. HABIBUL BASAR" },
@@ -141,6 +158,7 @@
       { roll: "962", reg: "20221555568", name: "MORIOM AKTER MIM" }
     ];
 
+    // --- Course Data ---
     const coursesData = [
       { code: "E 401", title: "20th Century English Literature I" },
       { code: "E 402", title: "20th Century North American Literature I" },
@@ -157,31 +175,45 @@
       { code: "E 413", title: "Research Methods in Applied Linguistics and ELT" }
     ];
 
-    // Crawled Official Faculty List - Department of English, Jahangirnagar University
+    // --- Official Teacher List (Filtered) ---
     const teachersData = [
       { name: "DR. MD. MANIRUZZAMAN", designation: "Professor, Department of English" },
-      { name: "AHMED REZA", designation: "Professor, Department of English" },
       { name: "DR. SANYAT SATTAR", designation: "Professor, Department of English" },
       { name: "MASHRUR SHAHID HOSSAIN", designation: "Professor, Department of English" },
       { name: "DR. LAIZU NASRIN", designation: "Professor, Department of English" },
       { name: "DR. MOHAMMAD RAIHAN SHARIF", designation: "Professor, Department of English" },
-      { name: "RUMANA HOSSAIN", designation: "Associate Professor, Department of English" },
       { name: "MANMAY ZAFAR", designation: "Associate Professor, Department of English" },
       { name: "SABERA SULTANA", designation: "Associate Professor, Department of English" },
       { name: "TANIA SHARMIN", designation: "Associate Professor, Department of English" },
-      { name: "KAZI ASHRAF UDDIN", designation: "Associate Professor, Department of English" },
       { name: "MD. AFAZ UDDIN", designation: "Associate Professor, Department of English" },
-      { name: "MEHNAZ MUSTAFA IQBAL", designation: "Assistant Professor, Department of English" },
       { name: "SHWAGOTA SAYEED", designation: "Assistant Professor, Department of English" },
       { name: "SUMANA GUPTA", designation: "Assistant Professor, Department of English" },
       { name: "TANIA TASNEEM HOSSAIN", designation: "Assistant Professor, Department of English" },
       { name: "ANINDITA ROY", designation: "Assistant Professor, Department of English" },
       { name: "RABITA RAHMAN", designation: "Assistant Professor, Department of English" },
-      { name: "FARZANA ZEBEEN KHAN", designation: "Assistant Professor, Department of English" },
       { name: "MD TAQI YASIR", designation: "Lecturer, Department of English" },
       { name: "JARIN TASNEEM SHOILEE", designation: "Lecturer, Department of English" },
       { name: "MD. SALAH UDDIN", designation: "Lecturer, Department of English" }
     ];
+
+    // --- Title Case Function ---
+    function toTitleCase(str) {
+      if (!str) return "";
+      const minorWords = new Set(["a", "an", "the", "and", "but", "or", "for", "nor", "on", "in", "at", "to", "by", "with", "of", "from", "into", "over", "under", "about", "through", "as"]);
+      return str.split('\n').map(line => {
+        const words = line.split(/(\s+)/);
+        return words.map((word, index) => {
+          if (/^\s+$/.test(word) || word === "") return word;
+          const cleanWord = word.replace(/[.,\/#!$%\^&\*;:{}=\-_`~()]/g,"").toLowerCase();
+          const isFirst = index === 0;
+          const isLast = index === words.length - 1;
+          if (isFirst || isLast || !minorWords.has(cleanWord)) {
+            return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
+          }
+          return word.toLowerCase();
+        }).join("");
+      }).join('\n');
+    }
 
     function App() {
       // --- States ---
@@ -200,28 +232,20 @@
       const [modalMsg, setModalMsg] = useState("");
       const [base64Logo, setBase64Logo] = useState("");
 
-      // Re-initialize icons safely after render
       useEffect(() => {
-        if (window.lucide) {
-          window.lucide.createIcons();
-        }
+        if (window.lucide) window.lucide.createIcons();
       });
 
-      // Fetch Image and Convert to Base64 to ensure MS Word embedding works flawlessly
+      // Fetch Image to Base64
       useEffect(() => {
         fetch('https://i.postimg.cc/3xrkfThk/ju-logo.png')
           .then(res => res.blob())
           .then(blob => {
             const reader = new FileReader();
-            reader.onloadend = () => {
-              setBase64Logo(reader.result);
-            };
+            reader.onloadend = () => setBase64Logo(reader.result);
             reader.readAsDataURL(blob);
           })
-          .catch(err => {
-            console.error("Image conversion failed, falling back to URL", err);
-            setBase64Logo('https://i.postimg.cc/3xrkfThk/ju-logo.png'); // fallback
-          });
+          .catch(err => setBase64Logo('https://i.postimg.cc/3xrkfThk/ju-logo.png'));
       }, []);
 
       // Mappings
@@ -234,13 +258,9 @@
       useEffect(() => {
         if (selectedRoll) {
           const found = studentsData.find(s => s.roll === selectedRoll);
-          if (found) {
-            setStudentName(found.name);
-            setStudentReg(found.reg);
-          }
+          if (found) { setStudentName(found.name); setStudentReg(found.reg); }
         } else {
-          setStudentName("");
-          setStudentReg("");
+          setStudentName(""); setStudentReg("");
         }
       }, [selectedRoll]);
 
@@ -257,12 +277,11 @@
         return submissionDate;
       }, [submissionDate]);
 
-      const uppercaseTopic = useMemo(() => {
+      const titleCasedTopic = useMemo(() => {
         if (!assignmentTopic) return "___________________________________________________\n___________________________________________________";
-        return assignmentTopic.trim().toUpperCase();
+        return toTitleCase(assignmentTopic.trim());
       }, [assignmentTopic]);
 
-      // --- Actions ---
       const validateFields = () => {
         if (!assignmentTopic.trim()) { setModalMsg("অনুগ্রহ করে Assignment Topic লিখুন!"); setShowModal(true); return false; }
         if (!selectedCourseCode) { setModalMsg("অনুগ্রহ করে Course Code সিলেক্ট করুন!"); setShowModal(true); return false; }
@@ -272,36 +291,48 @@
         return true;
       };
 
+      // --- PDF Generator Logic (Mobile Proof & Layout Proof) ---
       const handlePdfDownload = () => {
         if (!validateFields()) return;
+        
         const element = document.getElementById("cover-page-document");
+        
+        // Temporarily force width to 794px before capturing so mobile layout doesn't break
+        const originalWidth = element.style.width;
+        const originalMaxWidth = element.style.maxWidth;
+        element.style.width = "794px";
+        element.style.maxWidth = "794px";
+
         const opt = {
           margin: 0,
           filename: `Cover_Page_${selectedRoll}.pdf`,
           image: { type: 'jpeg', quality: 1 },
-          html2canvas: { scale: 2, useCORS: true },
+          html2canvas: { scale: 2, useCORS: true, letterRendering: true },
           jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' }
         };
-        html2pdf().set(opt).from(element).save();
+
+        html2pdf().set(opt).from(element).save().then(() => {
+            // Revert back to responsive width
+            element.style.width = originalWidth;
+            element.style.maxWidth = originalMaxWidth;
+        });
       };
 
+      // --- Word Generator Logic ---
       const handleWordDownload = () => {
         if (!validateFields()) return;
 
-        // Structured HTML specifically designed to render perfectly in MS Word
-        // A4 page spacing dynamically handled with balanced margins
-        
         const centeredDetailsHtml = `
-          <p align="center" style="margin-top: 30px;">Submitted to</p>
+          <p align="center" style="margin-top: 40px;">Submitted to</p>
           <p align="center" style="font-weight: bold;">${currentTeacher.name}</p>
           <p align="center">${currentTeacher.designation.split(',')[0]}</p>
           <p align="center">Department of English</p>
           <p align="center">Jahangirnagar University</p>
           <p align="center">Savar, Dhaka</p>
           
-          <p align="center" style="margin-top: 40px;">Submitted by</p>
+          <p align="center" style="margin-top: 50px;">Submitted by</p>
           <p align="center" style="font-weight: bold;">${studentName}</p>
-          <p align="center">Roll No: ${selectedRoll}</p>
+          <p align="center">Roll No: <b>${selectedRoll}</b></p>
           <p align="center">Registration: ${studentReg}</p>
           <p align="center">Session: 2021-22</p>
           <p align="center">Department of English</p>
@@ -324,7 +355,7 @@
               <td width="50%" valign="top" style="padding-left: 10px;">
                 <p>Submitted by</p>
                 <p style="font-weight: bold;">${studentName}</p>
-                <p>Roll No: ${selectedRoll}</p>
+                <p>Roll No: <b>${selectedRoll}</b></p>
                 <p>Registration: ${studentReg}</p>
                 <p>Session: 2021-22</p>
                 <p>Department of English</p>
@@ -342,47 +373,27 @@
             <meta charset="utf-8">
             <title>Cover Page</title>
             <style>
-              @page {
-                size: 8.27in 11.69in; /* A4 Size */
-                margin: 1in; /* Professional Word Margin */
-              }
-              body {
-                font-family: 'Times New Roman', serif;
-                margin: 0;
-                padding: 0;
-              }
-              p {
-                margin: 0;
-                padding: 0;
-                margin-bottom: 5px;
-                font-family: 'Times New Roman', serif;
-                font-size: 13pt; /* Good readable size for A4 */
-              }
-              .topic {
-                font-size: 14pt;
-                font-weight: bold;
-                text-transform: uppercase;
-                margin-top: 10px;
-                margin-bottom: 25px;
-                line-height: 1.3;
-              }
+              @page { size: 8.27in 11.69in; margin: 1in; }
+              body { font-family: 'Times New Roman', serif; margin: 0; padding: 0; }
+              p { margin: 0; padding: 0; margin-bottom: 6px; font-family: 'Times New Roman', serif; font-size: 13pt; line-height: 1.25; }
+              .topic { font-size: 14pt; font-weight: bold; margin-top: 10px; margin-bottom: 25px; line-height: 1.35; }
             </style>
           </head>
           <body>
             <div>
-              <p align="center" style="margin-top: 15px; margin-bottom: 15px;">
-                <img src="${base64Logo}" width="100" height="100" />
+              <p align="center" style="margin-top: 25px; margin-bottom: 20px;">
+                <img src="${base64Logo}" width="135" height="135" />
               </p>
               
               <p align="center" style="margin-bottom: 5px;">Assignment on</p>
-              <p align="center" class="topic">${uppercaseTopic.replace(/\n/g, '<br/>')}</p>
+              <p align="center" class="topic">${titleCasedTopic.replace(/\n/g, '<br/>')}</p>
               
-              <p align="center"><b>Course Code: ${selectedCourseCode}</b></p>
-              <p align="center"><b>Course Title: ${currentCourseTitle}</b></p>
+              <p align="center">Course Code: <b>${selectedCourseCode}</b></p>
+              <p align="center">Course Title: <b>${currentCourseTitle}</b></p>
               
               ${layoutStyle === 'centered' ? centeredDetailsHtml : sideBySideDetailsHtml}
               
-              <p align="center" style="margin-top: 50px;"><b>Submission Date: - ${formattedDate}</b></p>
+              <p align="center" style="margin-top: 80px;"><b>Submission Date: - ${formattedDate}</b></p>
             </div>
           </body>
           </html>
@@ -425,15 +436,8 @@
           {/* Setup Panel (Left) */}
           <div class="w-full lg:w-[350px] bg-white rounded-3xl p-5 lg:p-6 shadow-xl flex flex-col gap-5 border border-slate-200/80 max-h-[92vh] overflow-y-auto shrink-0 z-10">
             <div class="flex items-center gap-3">
-              <div class="p-2 bg-amber-50 rounded-2xl border border-amber-200/60 shadow-sm flex-shrink-0">
-                <svg width="30" height="30" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <ellipse cx="35" cy="35" rx="14" ry="24" fill="#38BDF8" fillOpacity="0.3" stroke="#0284C7" strokeWidth="3" transform="rotate(-30 35 35)" />
-                  <ellipse cx="65" cy="35" rx="14" ry="24" fill="#38BDF8" fillOpacity="0.3" stroke="#0284C7" strokeWidth="3" transform="rotate(30 65 35)" />
-                  <rect x="38" y="35" width="24" height="38" rx="12" fill="#FBBF24" stroke="#1E293B" strokeWidth="4" />
-                  <path d="M39 46H61" stroke="#1E293B" strokeWidth="4" strokeLinecap="round" />
-                  <path d="M39 56H61" stroke="#1E293B" strokeWidth="4" strokeLinecap="round" />
-                  <circle cx="50" cy="27" r="9" fill="#FBBF24" stroke="#1E293B" strokeWidth="4" />
-                </svg>
+              <div class="w-12 h-12 rounded-xl overflow-hidden border border-slate-200 shadow-sm flex-shrink-0">
+                <img src="https://i.postimg.cc/02Yb36Sv/bb.jpg" alt="Logo" class="w-full h-full object-cover" />
               </div>
               <div>
                 <h1 class="text-sm font-extrabold text-slate-800 tracking-tight leading-tight">CP(Cover Page)<br/>generator</h1>
@@ -501,8 +505,9 @@
                   type="date"
                   value={submissionDate}
                   onKeyDown={(e) => e.preventDefault()}
+                  onClick={(e) => e.target.showPicker && e.target.showPicker()}
                   onChange={(e) => setSubmissionDate(e.target.value)}
-                  class="w-full p-2 text-xs rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-slate-50 text-slate-600 font-semibold cursor-pointer"
+                  class="w-full p-2 text-xs rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-slate-50 text-slate-600 font-semibold cursor-pointer smart-date-input"
                 />
               </div>
 
@@ -528,88 +533,97 @@
             </div>
           </div>
 
-          {/* Document Preview (Right) - Perfect A4 Simulation */}
-          <div class="flex-1 flex justify-center w-full max-w-[850px] overflow-auto py-2">
+          {/* Document Preview (Right) - FIXED STRICT A4 STRUCTURE */}
+          <div class="flex-1 flex justify-center w-full overflow-auto py-2">
             
             <div 
               id="cover-page-document"
-              class="w-full max-w-[750px] a4-preview bg-white flex flex-col items-center justify-between py-[8%] px-[10%] relative"
+              class="bg-white a4-preview relative"
+              style={{
+                padding: '50px 60px', /* Standard Margins */
+                margin: '0 auto',
+                boxSizing: 'border-box',
+                display: 'flex',
+                flexDirection: 'column'
+              }}
             >
               
               {/* Header: Logo and Topic */}
-              <div class="flex flex-col items-center w-full">
+              <div style={{ textAlign: 'center', marginBottom: '25px', marginTop: '15px' }}>
                 <img 
                   src={base64Logo || "https://i.postimg.cc/3xrkfThk/ju-logo.png"} 
                   alt="JU Logo" 
-                  class="w-[110px] h-[110px] object-contain mb-4 mt-2" 
+                  style={{ width: '135px', height: '135px', objectFit: 'contain', margin: '0 auto 20px auto' }}
                   crossOrigin="anonymous"
                 />
 
-                <div class="academic-font text-center w-full">
-                  <p class="text-[13px] lg:text-[14px] mb-2">Assignment on</p>
-                  <h2 class="font-bold text-[14px] lg:text-[16px] uppercase max-w-[95%] mx-auto whitespace-pre-wrap leading-relaxed px-4">
-                    {uppercaseTopic}
+                <div class="academic-font">
+                  <p style={{ fontSize: '12pt', marginBottom: '8px' }}>Assignment on</p>
+                  <h2 style={{ fontSize: '14pt', fontWeight: 'bold', whiteSpace: 'pre-wrap', lineHeight: '1.4', margin: '0 auto' }}>
+                    {titleCasedTopic}
                   </h2>
                 </div>
               </div>
 
-              {/* Middle: Course Info - Completely Bold */}
-              <div class="academic-font text-center flex flex-col gap-1 text-[13px] lg:text-[15px] w-full font-bold">
-                <p>Course Code: {selectedCourseCode || "_____"}</p>
-                <p>Course Title: {currentCourseTitle}</p>
+              {/* Middle: Course Info */}
+              <div class="academic-font" style={{ textAlign: 'center', fontSize: '12pt', lineHeight: '1.5', marginTop: '15px' }}>
+                <p>Course Code: <span style={{ fontWeight: 'bold' }}>{selectedCourseCode || "_____"}</span></p>
+                <p>Course Title: <span style={{ fontWeight: 'bold' }}>{currentCourseTitle}</span></p>
               </div>
 
-              {/* Lower Middle: Submitted To & By based on Layout Style */}
-              {layoutStyle === 'centered' ? (
-                <div class="w-full flex flex-col gap-8 academic-font text-center text-[13px] lg:text-[15px]">
-                  <div class="flex flex-col gap-1">
-                    <p>Submitted to</p>
-                    <p class="font-bold">{currentTeacher.name}</p>
-                    <p>{currentTeacher.designation.split(',')[0]}</p>
-                    <p>Department of English</p>
-                    <p>Jahangirnagar University</p>
-                    <p>Savar, Dhaka</p>
-                  </div>
+              {/* Lower Middle: Submitted To & By */}
+              <div style={{ width: '100%', marginTop: '40px' }}>
+                {layoutStyle === 'centered' ? (
+                  <div class="academic-font" style={{ textAlign: 'center', fontSize: '12pt', lineHeight: '1.5' }}>
+                    <div style={{ marginBottom: '35px' }}>
+                      <p>Submitted to</p>
+                      <p style={{ fontWeight: 'bold' }}>{currentTeacher.name}</p>
+                      <p>{currentTeacher.designation.split(',')[0]}</p>
+                      <p>Department of English</p>
+                      <p>Jahangirnagar University</p>
+                      <p>Savar, Dhaka</p>
+                    </div>
 
-                  <div class="flex flex-col gap-1">
-                    <p>Submitted by</p>
-                    <p class="font-bold uppercase">{studentName || "_____________________"}</p>
-                    <p>Roll No: {selectedRoll || "_____"}</p>
-                    <p>Registration: {studentReg || "_____________"}</p>
-                    <p>Session: 2021-22</p>
-                    <p>Department of English</p>
-                    <p>Faculty of Arts & Humanities</p>
-                    <p>Jahangirnagar University</p>
-                    <p>Savar, Dhaka.</p>
+                    <div>
+                      <p>Submitted by</p>
+                      <p style={{ fontWeight: 'bold', textTransform: 'uppercase' }}>{studentName || "_____________________"}</p>
+                      <p>Roll No: <span style={{ fontWeight: 'bold' }}>{selectedRoll || "_____"}</span></p>
+                      <p>Registration: {studentReg || "_____________"}</p>
+                      <p>Session: 2021-22</p>
+                      <p>Department of English</p>
+                      <p>Faculty of Arts & Humanities</p>
+                      <p>Jahangirnagar University</p>
+                      <p>Savar, Dhaka.</p>
+                    </div>
                   </div>
-                </div>
-              ) : (
-                <div class="w-full grid grid-cols-2 gap-4 academic-font text-left text-[13px] lg:text-[15px]">
-                  <div class="flex flex-col gap-1">
-                    <p>Submitted to</p>
-                    <p class="font-bold">{currentTeacher.name}</p>
-                    <p>{currentTeacher.designation.split(',')[0]}</p>
-                    <p>Department of English</p>
-                    <p>Jahangirnagar University</p>
-                    <p>Savar, Dhaka</p>
-                  </div>
+                ) : (
+                  <div class="academic-font" style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12pt', lineHeight: '1.5' }}>
+                    <div style={{ width: '48%' }}>
+                      <p>Submitted to</p>
+                      <p style={{ fontWeight: 'bold' }}>{currentTeacher.name}</p>
+                      <p>{currentTeacher.designation.split(',')[0]}</p>
+                      <p>Department of English</p>
+                      <p>Jahangirnagar University</p>
+                      <p>Savar, Dhaka</p>
+                    </div>
 
-                  <div class="flex flex-col gap-1 pl-4">
-                    <p>Submitted by</p>
-                    <p class="font-bold uppercase">{studentName || "_____________________"}</p>
-                    <p>Roll No: {selectedRoll || "_____"}</p>
-                    <p>Registration: {studentReg || "_____________"}</p>
-                    <p>Session: 2021-22</p>
-                    <p>Department of English</p>
-                    <p>Faculty of Arts & Humanities</p>
-                    <p>Jahangirnagar University</p>
-                    <p>Savar, Dhaka.</p>
+                    <div style={{ width: '48%', paddingLeft: '5%' }}>
+                      <p>Submitted by</p>
+                      <p style={{ fontWeight: 'bold', textTransform: 'uppercase' }}>{studentName || "_____________________"}</p>
+                      <p>Roll No: <span style={{ fontWeight: 'bold' }}>{selectedRoll || "_____"}</span></p>
+                      <p>Registration: {studentReg || "_____________"}</p>
+                      <p>Session: 2021-22</p>
+                      <p>Department of English</p>
+                      <p>Faculty of Arts & Humanities</p>
+                      <p>Jahangirnagar University</p>
+                      <p>Savar, Dhaka.</p>
+                    </div>
                   </div>
-                </div>
-              )}
+                )}
+              </div>
 
-              {/* Bottom: Submission Date - Completely Bold */}
-              <div class="w-full academic-font text-center text-[13px] lg:text-[15px] font-bold mt-2">
+              {/* Bottom: Submission Date */}
+              <div class="academic-font" style={{ textAlign: 'center', fontSize: '12pt', fontWeight: 'bold', marginTop: 'auto', marginBottom: '20px' }}>
                 <p>Submission Date: - {formattedDate}</p>
               </div>
 
