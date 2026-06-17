@@ -301,7 +301,7 @@
         return true;
       };
 
-      // --- STRICT PDF Generator Logic (No Blank Pages) ---
+      // --- STRICT PDF Generator Logic (Scroll Bug Fixed) ---
       const handlePdfDownload = () => {
         if (!validateFields()) return;
         
@@ -311,10 +311,15 @@
           margin: 0,
           filename: `Cover_Page_${selectedRoll}.pdf`,
           image: { type: 'jpeg', quality: 1 },
-          // WindowWidth forces the renderer to act as if screen is exactly 794px
-          html2canvas: { scale: 2, useCORS: true, letterRendering: true, width: 794, height: 1123 },
-          // Pixels unit precisely matching the CSS guarantees 1 perfect page
-          jsPDF: { unit: 'px', format: [794, 1123], orientation: 'portrait' }
+          html2canvas: { 
+            scale: 2, 
+            useCORS: true, 
+            letterRendering: true,
+            scrollY: 0, // This fixes the top margin gap bug when scrolling
+            scrollX: 0,
+            windowWidth: 794
+          },
+          jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' } // Uses standard mm for A4 formatting
         };
 
         html2pdf().set(opt).from(element).save();
